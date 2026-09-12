@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Danh sách sách - Thư viện{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0" style="color: var(--accent-warm);">
+        <i class="bi bi-bookshelf me-2"></i>Danh Sách Sách
+    </h3>
+</div>
+
+<!-- Lọc Thể Loại -->
+<div class="card card-custom mb-4">
+    <div class="card-body">
+        <h6 class="fw-bold mb-3" style="color: var(--accent-warm);">Lọc theo thể loại:</h6>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'book_list' %}"
+                class="btn btn-sm {% if not selected_the_loai %}btn-dark{% else %}btn-outline-dark{% endif %} px-3 rounded-pill">
+                Tất cả
+            </a>
+            {% for tl in danh_sach_the_loai %}
+            <a href="{% url 'book_list' %}?the_loai={{ tl.id }}"
+                class="btn btn-sm {% if selected_the_loai == tl.id %}btn-dark{% else %}btn-outline-dark{% endif %} px-3 rounded-pill">
+                {{ tl.ten }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Bảng Danh Sách Sách -->
+<div class="card card-custom">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #EFE8DF; color: var(--accent-warm);">
+                    <tr>
+                        <th class="py-3 px-3">#</th>
+                        <th class="py-3">Tiêu đề sách</th>
+                        <th class="py-3">Năm XB</th>
+                        <th class="py-3">Giá bán</th>
+                        <th class="py-3">Thể loại</th>
+                        <th class="py-3">Tác giả</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sach in sachs %}
+                    <tr>
+                        <td class="px-3 fw-medium text-muted">{{ forloop.counter }}</td>
+                        <td class="fw-bold" style="color: var(--accent-warm);">{{ sach.tieu_de }}</td>
+                        <td>{{ sach.nam_xuat_ban|default:"N/A" }}</td>
+                        {% load humanize %}
+                        <td>
+                            {% if sach.gia %}
+                            <span class="fw-bold text-success">{{ sach.gia|floatformat:0|intcomma }} VNĐ</span>
+                            {% else %}
+                            <span class="text-muted small">Chưa cập nhật</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sach.the_loai %}
+                            <span class="badge badge-beige rounded-pill px-3 py-2">{{ sach.the_loai.ten }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary rounded-pill px-2">Chưa phân loại</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for tg in sach.tac_gia.all %}
+                            <span class="badge bg-light text-dark border me-1">{{ tg.ho_ten }}</span>
+                            {% empty %}
+                            <span class="text-muted small">Chưa có tác giả</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                            <em>Không tìm thấy cuốn sách nào thuộc thể loại này!</em>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

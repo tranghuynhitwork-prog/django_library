@@ -1,0 +1,130 @@
+//bài 3
+
+# Import các model (thay 'app_name' bằng tên app thực tế trong project của bạn)
+from app_name.models import TheLoai, TacGia, Sach
+
+# Tạo 3 bản ghi TheLoai
+tl1 = TheLoai.objects.create(ten_the_loai="Tiểu thuyết")
+tl2 = TheLoai.objects.create(ten_the_loai="Khoa học")
+tl3 = TheLoai.objects.create(ten_the_loai="Kỹ năng sống")
+
+# Tạo 4 bản ghi TacGia
+tg1 = TacGia.objects.create(ten_tac_gia="Nguyễn Nhật Ánh")
+tg2 = TacGia.objects.create(ten_tac_gia="Stephen Hawking")
+tg3 = TacGia.objects.create(ten_tac_gia="Dale Carnegie")
+tg4 = TacGia.objects.create(ten_tac_gia="Tác Giả Dư Thừa") # Dùng để xoá ở câu 4
+
+# Tạo 6 bản ghi Sach (chưa gán quan hệ)
+s1 = Sach.objects.create(tieu_de="Mắt Biếc", nam_xuat_ban=2010, gia=100000)
+s2 = Sach.objects.create(tieu_de="Lược Sử Thời Gian", nam_xuat_ban=2018, gia=150000)
+s3 = Sach.objects.create(tieu_de="Đắc Nhân Tâm", nam_xuat_ban=2016, gia=120000)
+s4 = Sach.objects.create(tieu_de="Tôi Thấy Hoa Vàng Trên Cỏ Xanh", nam_xuat_ban=2019, gia=110000)
+s5 = Sach.objects.create(tieu_de="Vũ Trụ Trong Vỏ Hạt Dẻ", nam_xuat_ban=2020, gia=180000)
+s6 = Sach.objects.create(tieu_de="Quăng Gánh Lo Đi Và Vui Sống", nam_xuat_ban=2014, gia=95000)
+
+# a) Lấy toàn bộ sách
+sach_all = Sach.objects.all()
+print(sach_all)
+
+# b) Lọc các sách có năm xuất bản sau 2015 (__gt)
+sach_sau_2015 = Sach.objects.filter(nam_xuat_ban__gt=2015)
+print(sach_sau_2015)
+
+# c) Tìm sách có tiêu đề chứa từ khóa bất kỳ (ví dụ: "Thời Gian") (__icontains)
+sach_tu_khoa = Sach.objects.filter(tieu_de__icontains="Thời Gian")
+print(sach_tu_khoa)
+
+# d) Sắp xếp sách theo giá tăng dần và lấy quyển có giá cao nhất
+sach_sap_xep = Sach.objects.order_by('gia')
+print("Danh sách tăng dần:", sach_sap_xep)
+
+sach_gia_cao_nhat = Sach.objects.order_by('gia').last()
+# Hoặc: sach_gia_cao_nhat = Sach.objects.order_by('-gia').first()
+print("Sách giá cao nhất:", sach_gia_cao_nhat)
+
+# Chọn 1 cuốn sách (ví dụ cuốn sách đầu tiên)
+sach_can_update = Sach.objects.first()
+print("Giá cũ:", sach_can_update.gia)
+
+# Tăng giá thêm 10% và lưu lại
+sach_can_update.gia = sach_can_update.gia * 1.10
+sach_can_update.save()
+
+# Kiểm tra lại kết quả
+sach_can_update.refresh_from_db()
+print("Giá mới sau khi tăng 10%:", sach_can_update.gia)
+
+# Chọn tác giả chưa gán với sách nào (ví dụ tg4 vừa tạo ở trên)
+tac_gia_xoa = TacGia.objects.get(ten_tac_gia="Tác Giả Dư Thừa")
+
+# Thực hiện xóa
+tac_gia_xoa.delete()
+
+# Kiểm tra lại danh sách tác giả để xác nhận đã xóa thành công
+print("Danh sách tác giả còn lại:", TacGia.objects.all())
+
+//bài 4
+>>> from app_name.models import TheLoai, TacGia, Sach
+
+# Lấy các Thể loại & Tác giả đã có
+>>> tl_tieu_thuyet = TheLoai.objects.get(ten_the_loai="Tiểu thuyết")
+>>> tl_khoa_hoc = TheLoai.objects.get(ten_the_loai="Khoa học")
+>>> tl_ky_nang = TheLoai.objects.get(ten_the_loai="Kỹ năng sống")
+
+>>> tg_anh = TacGia.objects.get(ten_tac_gia="Nguyễn Nhật Ánh")
+>>> tg_hawking = TacGia.objects.get(ten_tac_gia="Stephen Hawking")
+>>> tg_carnegie = TacGia.objects.get(ten_tac_gia="Dale Carnegie")
+
+# --- Lấy 6 sách ---
+>>> s1 = Sach.objects.get(tieu_de="Mắt Biếc")
+>>> s2 = Sach.objects.get(tieu_de="Lược Sử Thời Gian")
+>>> s3 = Sach.objects.get(tieu_de="Đắc Nhân Tâm")
+>>> s4 = Sach.objects.get(tieu_de="Tôi Thấy Hoa Vàng Trên Cỏ Xanh")
+>>> s5 = Sach.objects.get(tieu_de="Vũ Trụ Trong Vỏ Hạt Dẻ")
+>>> s6 = Sach.objects.get(tieu_de="Quăng Gánh Lo Đi Và Vui Sống")
+
+# --- Bước 4: Gán the_loai cho từng sách (ForeignKey) ---
+>>> s1.the_loai = tl_tieu_thuyet; s1.save()
+>>> s2.the_loai = tl_khoa_hoc; s2.save()
+>>> s3.the_loai = tl_ky_nang; s3.save()
+>>> s4.the_loai = tl_tieu_thuyet; s4.save()
+>>> s5.the_loai = tl_khoa_hoc; s5.save()
+>>> s6.the_loai = tl_ky_nang; s6.save()
+
+# --- Bước 5: Gán tác giả bằng .add() (ManyToMany) ---
+>>> s1.tac_gia.add(tg_anh)
+>>> s2.tac_gia.add(tg_hawking)
+>>> s3.tac_gia.add(tg_carnegie)
+>>> s4.tac_gia.add(tg_anh)
+>>> s5.tac_gia.add(tg_hawking)
+>>> s6.tac_gia.add(tg_carnegie)
+
+# Gán bổ sung thêm tác giả thứ 2 cho một cuốn sách (ví dụ Sách 2 có thêm tg_carnegie)
+>>> s2.tac_gia.add(tg_carnegie)
+
+>>> tl = TheLoai.objects.get(ten_the_loai="Tiểu thuyết")
+>>> print("Các sách thuộc thể loại 'Tiểu thuyết':")
+>>> tl.sach_list.all()
+<QuerySet [<Sach: Mắt Biếc>, <Sach: Tôi Thấy Hoa Vàng Trên Cỏ Xanh>]>
+
+>>> tg = TacGia.objects.get(ten_tac_gia="Stephen Hawking")
+>>> print("Các sách của tác giả Stephen Hawking:")
+>>> tg.sach_list.all()
+<QuerySet [<Sach: Lược Sử Thời Gian>, <Sach: Vũ Trụ Trong Vỏ Hạt Dẻ>]>
+
+# Chọn thể loại "Kỹ năng sống" để xóa
+>>> tl_ky_nang = TheLoai.objects.get(ten_the_loai="Kỹ năng sống")
+
+# Kiểm tra thể loại của sách "Đắc Nhân Tâm" trước khi xóa
+>>> s3 = Sach.objects.get(tieu_de="Đắc Nhân Tâm")
+>>> print("Thể loại trước khi xóa:", s3.the_loai)
+Thể loại trước khi xóa: Kỹ năng sống
+
+# Xóa bản ghi thể loại
+>>> tl_ky_nang.delete()
+(1, {'app_name.TheLoai': 1})
+
+# Kiểm tra lại thể loại của sách "Đắc Nhân Tâm" sau khi xóa
+>>> s3.refresh_from_db()
+>>> print("Thể loại sau khi xóa:", s3.the_loai)
+Thể loại sau khi xóa: None
